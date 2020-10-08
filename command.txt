@@ -1,0 +1,69 @@
+●環境起動
+# コンテナ1(curl用)
+docker run --rm -it --name attach    -v c:\ctf:/home/ctf -w /home/ctf --privileged --net=host inaz2/ctfbox
+
+●解析
+# basic認証ログインしつつwebページ取得
+curl -u <ユーザ名>:<パスワード> http://<URL>
+curl -u http://<ユーザ名>:<パスワード>@<URL>
+
+# リクエストにヘッダを付ける
+curl -H "Referer:http://example.com" http://<URL>
+curl -H "Cookie:loggedin=1" http://<URL>
+
+# リクエストの転送情報を消す
+curl -s
+
+# リクエストの転送情報を消すがエラーメッセージは残す
+curl -Ss 
+
+# リクエストのヘッダ情報を表示する。
+curl -v
+
+# POSTメソッド、GETメソッド追加
+curl --data 'post=postvalue&get=getvalue' http://<URL>
+
+
+●その他
+# 標準エラーをテキスト出力
+command  2> output.txt
+
+# 16進数のバイナリ表示
+$ (printf '\x3d\x3d\x51\x63\x43\x74\x6d\x4d\x6d\x6c\x31\x56\x69\x56\x33\x62';cat) | hexdump -C
+00000000  3d 3d 51 63 43 74 6d 4d  6d 6c 31 56 69 56 33 62  |==QcCtmMml1ViV3b|
+00000010
+
+
+●bash関数
+
+function urlencode {
+nkf -WwMQ | tr = %
+}
+
+function urldecode {
+nkf --url-input
+}
+
+function xor()
+{
+    local res=(`echo "$1" | sed "s/../0x& /g"`)
+    shift 1
+    while [[ "$1" ]]; do
+        local one=(`echo "$1" | sed "s/../0x& /g"`)
+        local count1=${#res[@]}
+        if [ $count1 -lt ${#one[@]} ]
+        then
+            count1=${#one[@]}
+        fi
+        for (( i = 0; i < $count1; i++ ))
+        do
+            res[$i]=$((${one[$i]:-0} ^ ${res[$i]:-0}))
+        done
+        shift 1
+    done
+    printf "%02x" "${res[@]}"
+}
+
+
+●一時メモ
+curl -u natas11:U82q5TCMMQ9xuFoI3dYX61s7OZD9JKoK 'http://natas11.natas.labs.overthewire.org/' -H 'Cookie:data=pVSyIeSCskTyUxMadT5dOVNbGigWFFcmHlGnU1ReLBcRXixT' > natas11.ans.html
